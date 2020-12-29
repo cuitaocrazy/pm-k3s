@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pm
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pm-resource-server
+  namespace: pm
+  labels:
+    app: pm-resource-server
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pm-resource-server
+  template:
+    metadata:
+      labels:
+        app: pm-resource-server
+    spec:
+      containers:
+        - name: pm-resource-server
+          image: cuitaocrazy/pm-resource-server
+          env:
+            - name: ISSUER_BASE_URL
+              value: https://auth.lanxinpay.com/auth/realms/pm
+            - name: MONGODB_URL
+              value: mongodb://mongodb-arbiter-headless.dbs/pm
+          ports:
+            - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pm-resource-server
+  namespace: pm
+spec:
+  clusterIP: None
+  selector:
+    app: pm-resource-server
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 3000

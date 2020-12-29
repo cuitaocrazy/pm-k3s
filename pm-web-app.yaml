@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pm
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pm-web-app
+  namespace: pm
+  labels:
+    app: pm-web-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pm-web-app
+  template:
+    metadata:
+      labels:
+        app: pm-web-app
+    spec:
+      containers:
+        - name: pm-web-app
+          image: cuitaocrazy/pm-web-app
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pm-web-app
+  namespace: pm
+spec:
+  clusterIP: None
+  selector:
+    app: pm-web-app
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80

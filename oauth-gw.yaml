@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pm
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gw-config
+  namespace: pm
+data:
+  application.yaml: |-
+    server.port: 8090
+    #logging.level:
+    #  root: TRACE
+    spring:
+      security:
+        oauth2:
+          client:
+            provider:
+              keycloak:
+                issuer-uri: https://auth.lanxinpay.com/auth/realms/pm
+                user-name-attribute: preferred_username
+            registration:
+              keycloak:
+                client-id: pm-app
+                client-secret: 0711ad1d-9053-4e3a-a6bb-db2b783e8eee
+                scope: openid
+      cloud:
+        gateway:
+          routes:
+            - id: pm-api
+              uri: http://pm-resource-server:3000
+              predicates:
+                - Host=pm.lanxinpay.com
+                - Path=/api/**
+              filters:
+                - OAuthApi
+            - id: pm-app
+              uri: http://pm-web-app
+              predicates:
+                - Host=pm.lanxinpay.com
+                - Method=GET
+              filters:
+                - name: OAuth
+                  args:
+                    staticPaths: /*.js,/*.css,/*.icon,/*.svg
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oauth-gw
+  namespace: pm
+  labels:
+    app: oauth-gw
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oauth-gw
+  template:
+    metadata:
+      labels:
+        app: oauth-gw
+    spec:
+      containers:
+        - name: oauth-gw
+          image: cuitaocrazy/oauth-gw
+          ports:
+            - containerPort: 8090
+          volumeMounts:
+            - name: config
+              mountPath: /app/application.yaml
+              subPath: application.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: gw-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oauth-gw
+  namespace: pm
+spec:
+  selector:
+    app: oauth-gw
+  type: NodePort
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 8090
+      nodePort: 32659
