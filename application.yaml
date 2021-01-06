@@ -24,6 +24,14 @@ spring:
             - Path=/api/**
           filters:
             - OAuthApi
+        - id: pm-app-redirect
+          uri: http://pm-web-app
+          predicaties:
+            - Host=pm.lanxinpay.com
+            - Path=/redirect/{anchor}
+          filters:
+            - OAuth
+            - RedirectWithAnchor=/#/{anchor}
         - id: pm-app
           uri: http://pm-web-app
           predicates:
