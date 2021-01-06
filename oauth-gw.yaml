@@ -38,7 +38,7 @@ data:
                 - OAuthApi
             - id: pm-app-redirect
               uri: http://pm-web-app
-              predicaties:
+              predicates:
                 - Host=pm.lanxinpay.com
                 - Path=/redirect/{anchor}
               filters:
