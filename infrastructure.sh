@@ -11,7 +11,7 @@ helm install mongodb \
 helm install mongodb-express \
   center/cowboysysop/mongo-express \
   -n dbs \
-  --set mongodbServer=mongodb-headless
+  --set mongodbServer=mongodb-0.mongodb-headless,mongodbEnableAdmin=true
 
 # keycloak 单节点部署
 cat <<EOF | helm install keycloak center/codecentric/keycloak -n keycloak --create-namespace --values -
