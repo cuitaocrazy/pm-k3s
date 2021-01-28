@@ -26,5 +26,7 @@ extraEnv: |
 replicas: 1
 EOF
 
-helm install postgresql center/bitnami/postgresql-ha -n pg --create-namespace \
+helm install postgresql center/bitnami/postgresql-ha -n dbs --create-namespace \
   --set global.postgresql.password=postgres,global.postgresql.repmgrPassword=repmgr,global.pgpool.adminPassword=admin
+
+helm install pgadmin center/runix/pgadmin4 -n dbs --create-namespace
