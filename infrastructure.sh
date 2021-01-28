@@ -26,6 +26,8 @@ extraEnv: |
 replicas: 1
 EOF
 
+# 安装完后如果添加用户，不仅要执行sql添加，而且需要在pgpool的pod里执行
+# pg_md5 -m --config-file="/opt/bitnami/pgpool/conf/pgpool.conf" -u "foo" "bar"
 helm install postgresql center/bitnami/postgresql-ha -n dbs --create-namespace \
   --set global.postgresql.password=postgres,global.postgresql.repmgrPassword=repmgr,global.pgpool.adminPassword=admin
 
